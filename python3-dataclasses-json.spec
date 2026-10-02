@@ -8,6 +8,8 @@ Group:		Libraries/Python
 #Source0Download: https://pypi.org/simple/dataclasses-json/
 Source0:	https://files.pythonhosted.org/packages/source/d/dataclasses-json/dataclasses_json-%{version}.tar.gz
 # Source0-md5:	bfcfcd66a85092c89e7b04ed8fa07a9e
+# part of https://github.com/lidatong/dataclasses-json/pull/577.patch (without update of poetry.lock, which is not present in sdist)
+Patch0:		dataclasses_json-marshmallow4.patch
 URL:		https://pypi.org/project/dataclasses-json/
 BuildRequires:	python3-build
 BuildRequires:	python3-installer
@@ -30,6 +32,7 @@ dataclass do/z JSON-a.
 
 %prep
 %setup -q -n dataclasses_json-%{version}
+%patch -P0 -p1
 
 %build
 %py3_build_pyproject

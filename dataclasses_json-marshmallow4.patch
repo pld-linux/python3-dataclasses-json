@@ -1,0 +1,77 @@
+From 3498ccd5d8014ec1208d2aaf03db2fb0a0ef2cc2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mark=C3=A9ta?= <meggy.calabkova@gmail.com>
+Date: Tue, 2 Jun 2026 17:52:45 +0200
+Subject: [PATCH 1/2] support marshmallow 4
+
+---
+ dataclasses_json/api.py |  1 -
+ dataclasses_json/mm.py  | 10 ++++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/dataclasses_json/api.py b/dataclasses_json/api.py
+index 3481e93f..5660b8d3 100644
+--- a/dataclasses_json/api.py
++++ b/dataclasses_json/api.py
+@@ -95,7 +95,6 @@ def schema(cls: Type[A],
+         return Schema(only=only,
+                       exclude=exclude,
+                       many=many,
+-                      context=context,
+                       load_only=load_only,
+                       dump_only=dump_only,
+                       partial=partial,
+diff --git a/dataclasses_json/mm.py b/dataclasses_json/mm.py
+index 9cfacf1d..08aa5790 100644
+--- a/dataclasses_json/mm.py
++++ b/dataclasses_json/mm.py
+@@ -245,9 +245,11 @@ def inner(type_, options):
+ 
+         if is_dataclass(type_):
+             if _issubclass_safe(type_, mixin):
+-                options['field_many'] = bool(
+-                    _is_supported_generic(field.type) and _is_collection(
+-                        field.type))
++                options['metadata'] = {
++                    "field_many": bool(
++                        _is_supported_generic(field.type) and _is_collection(
++                            field.type))
++                    }
+                 return fields.Nested(type_.schema(), **options)
+             else:
+                 warnings.warn(f"Nested dataclass field {field.name} of type "
+@@ -305,7 +307,7 @@ def schema(cls, mixin, infer_missing):
+         else:
+             type_ = field.type
+             options: typing.Dict[str, typing.Any] = {}
+-            missing_key = 'missing' if infer_missing else 'default'
++            missing_key = 'load_default' if infer_missing else 'dump_default'
+             if field.default is not MISSING:
+                 options[missing_key] = field.default
+             elif field.default_factory is not MISSING:
+
+From 58466d1caec7a9a998a5b3eadeb2f52a8a97f8ff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mark=C3=A9ta?= <meggy.calabkova@gmail.com>
+Date: Tue, 2 Jun 2026 18:26:36 +0200
+Subject: [PATCH 2/2] update poetry.lock to marshmallow >= 4 and python >= 3.9
+
+---
+ poetry.lock    | 2170 +++++++++++++++++++++++++++++++++---------------
+ pyproject.toml |    4 +-
+ 2 files changed, 1507 insertions(+), 667 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 20a147fb..62a63de0 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -9,9 +9,9 @@ readme = "README.md"
+ repository = 'https://github.com/lidatong/dataclasses-json'
+ 
+ [tool.poetry.dependencies]
+-python = "^3.7"
++python = "^3.9"
+ typing-inspect = ">=0.4.0, <1"
+-marshmallow = ">=3.18.0,<4.0.0"
++marshmallow = ">=4.0.0"
+ 
+ [tool.poetry.group.dev.dependencies]
+ pytest = "^7.1"
